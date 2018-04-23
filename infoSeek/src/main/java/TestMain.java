@@ -19,6 +19,15 @@ public class TestMain
         CriminalJudgmenSeek cjs  = new CriminalJudgmenSeek("file:///Users/alice/Desktop/2012/13402.xml");
 
         cjs.criminalInfoSeek();
+        cjs.evidenceSeek();
+        cjs.traumaticInfoSeek();
+        cjs.isOffset();
+        cjs.offSetByLaw();
+
+        CivilActionSeek cas = new CivilActionSeek("file:///Users/alice/Desktop/2012/13402.xml");
+        cas.hasCivilAction();
+        if(cas.hasCivilAction().equals("是"))
+            cas.getCivilActionContent();
 
     }
 }

@@ -31,7 +31,7 @@ public class FactModel {
     }
 
     public void setDate(String dateInfo) {
-        this.date = date;
+        this.date = dateInfo;
     }
 
     public String getReason() {

@@ -21,8 +21,9 @@ public FactModel factInfor(String filePath) throws JDOMException, IOException {
     Document document = saxBuilder.build(filePath);
     Element root = document.getRootElement();
 
-     Element caseCondition = root.getChild("QW").getChild("AJJBQK");
-    if(null != caseCondition) {
+
+    try {
+        Element caseCondition = root.getChild("QW").getChild("AJJBQK");
         //获取案件基本情况语段
         String description = caseCondition.getAttributeValue("value");
         System.out.println("description of this case is:" + description);
@@ -36,9 +37,12 @@ public FactModel factInfor(String filePath) throws JDOMException, IOException {
         if (matcher.find()) {
             dateInfo = matcher.group(0);
             System.out.println("Date of this case happened is :" + dateInfo);
-            factmodel.setDate(dateInfo);
-        }
 
+        }
+        System.out.println("dateInfo:"+dateInfo);
+        factmodel.setDate(dateInfo);
+        System.out.println("dateInfo:"+dateInfo);
+        System.out.println("fackSeek:"+factmodel.getDate());
         //提取案件发生原因
         Pattern reasonPattern = Pattern.compile("[因].*[口角]");
         Pattern reasonPattern2 = Pattern.compile("[因].*[争执]");
@@ -52,26 +56,30 @@ public FactModel factInfor(String filePath) throws JDOMException, IOException {
             reason = reasonMatch2.group(0);
             System.out.println("reason2 of this case is" + reason);
         } else {
-            reason = "no reason";
+            reason = "因纠纷发生厮打";
             System.out.println(reason);
         }
-        factmodel.setReason(reason);
+
+        String[] arr1 = reason.split("。");
+        factmodel.setReason(arr1[0]);
 
         //解析案发具体经过
-        Element fact = caseCondition.getChild("ZKDL").getChild("ZKSS");
+      //  Element fact = caseCondition.getChild("ZKDL").getChild("ZKSS");
         String detail = "";
-        if (null != fact) {
+     //   if (null != fact) {
             String detail_description = caseCondition.getAttributeValue("value");
             String[] arr = detail_description.split("，");
             for (int i = 2; i < arr.length; i++) {
                 detail += arr[i];
             }
             System.out.println(detail);
-        } else {
+     //   } else {
             System.out.println("no ZKSS");
-        }
+    //    }
 
         factmodel.setDetails(detail);
+    }catch (NullPointerException e){
+
     }
     return factmodel;
 }

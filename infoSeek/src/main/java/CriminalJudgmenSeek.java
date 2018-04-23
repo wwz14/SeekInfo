@@ -42,8 +42,9 @@ public class CriminalJudgmenSeek {
      */
     public CriminalInfo criminalInfoSeek()  {
         CriminalInfo criminalInfo = new CriminalInfo();
-        Element criminal = root.getChild("QW").getChild("DSR").getChild("YSF");
-        if(null != criminal) {
+
+        try {
+            Element criminal = root.getChild("QW").getChild("DSR").getChild("YSF");
             //获取被告基本情况概述
             String summary = criminal.getAttributeValue("value");
             String[] arr = summary.split("。");
@@ -52,11 +53,19 @@ public class CriminalJudgmenSeek {
             Element type = criminal.getChild("DSRLX");
             criminalInfo.setType(type.getAttributeValue("value"));
             //获取被告人国籍信息
-            Element nation = criminal.getChild("GJ");
-            criminalInfo.setNation(nation.getAttributeValue("value"));
-            //是否具有刑事承担能力
+            try {
+                Element nation = criminal.getChild("GJ");
+                criminalInfo.setNation(nation.getAttributeValue("value"));
+                //是否具有刑事承担能力
+            }catch (NullPointerException e){
+                criminalInfo.setNation("中国");
+            }
             Element isRes = criminal.getChild("XSZRNL");
             criminalInfo.setIsRes(isRes.getAttributeValue("value"));
+        }catch (NullPointerException e) {
+            criminalInfo.setType("自然人");
+            criminalInfo.setNation("中国");
+            criminalInfo.setIsRes("完全刑事责任能力");
         }
         //isjuvenile 获取被害人是否是少年犯罪
         Element recode = root.getChild("QW").getChild("SSJL").getChild("SNFT");
@@ -75,13 +84,21 @@ public class CriminalJudgmenSeek {
      */
     public ArrayList<Evidence> evidenceSeek() {
         ArrayList<Evidence> evidenceList = new ArrayList<Evidence>();
-        if(null!= evidenceList) {
-            List<Element> evidenceGroup =
-                    root.getChild("QW").getChild("AJJBQK").getChild("BSSLD").getChild("ZJXX").getChild("ZJFZ").getChildren("ZJJL");
+      List<Element> evidenceGroup = new ArrayList<Element>();
+      try {
+          evidenceGroup =
+                  root.getChild("QW").getChild("AJJBQK").getChild("BSSLD").getChild("ZJXX").getChild("ZJFZ").getChildren("ZJJL");
+      }catch(NullPointerException e){
+          return evidenceList;
+      }
+
+        if(!evidenceGroup.isEmpty()) {
             for (Element e : evidenceGroup) {
                 String des = e.getAttributeValue("value");
+                System.out.println("ecidence is:" + des);
                 Element type = e.getChild("ZJMX").getChild("ZL");
                 String evidenceType = type.getAttributeValue("value");
+                System.out.println("ecidence  type is:" + evidenceType);
                 evidenceList.add(new Evidence(des, evidenceType));
             }
         }else {
@@ -93,9 +110,14 @@ public class CriminalJudgmenSeek {
     public TraumaticInfo traumaticInfoSeek() {
         TraumaticInfo traumaticInfo = new TraumaticInfo();
         //判定被害人是否死亡
-        List<Element> victims = root.getChild("AJJBQK").getChildren("BHR");
+        List<Element> victims = new ArrayList<Element>();
+        try {
+            victims = root.getChild("QW").getChild("AJJBQK").getChildren("BHR");
+        }catch (NullPointerException e) {
+            return traumaticInfo;
+        }
         String isDeadCondition = "";
-        if(null != victims) {
+        if(!victims.isEmpty()) {
             for (Element e : victims) {
                 String victimName = e.getChild("BHRXM").getAttributeValue("value");
                 String isDead = e.getChild("SFSW").getAttributeValue("value");
@@ -103,7 +125,7 @@ public class CriminalJudgmenSeek {
 
             }
         }else{
-            Element general = root.getChild("AJJBQK");
+            Element general = root.getChild("QW");
             String des = general.getAttributeValue("value");
             if(des.contains("死亡")){
                 isDeadCondition = "是";
@@ -138,6 +160,8 @@ public class CriminalJudgmenSeek {
             }
         }
         traumaticInfo.setEvaluation(hurtLevel);
+        System.out.println("hurt level:"+hurtLevel);
+        System.out.println("if dead:" +isDeadCondition);
         return traumaticInfo;
     }
 
@@ -149,10 +173,15 @@ public class CriminalJudgmenSeek {
         String offsetAction = "";
         Element article = root.getChild("QW");
         String QW = article.getAttributeValue("value");
+        List<Element> statution = new ArrayList<Element>();
+        try {
+            statution = root.getChild("QW").getChild("CPFXGC").getChild("LXQJ").getChildren("ZDLXQJ");
+        }catch(NullPointerException e) {
+            return "无 ";
+        }
 
-        List<Element> statution = root.getChild("QW").getChild("CPFXGC").getChild("LXQJ").getChildren("ZDLXQJ");
         String offSet = "";
-        if(null != statution) {
+        if(!statution.isEmpty()) {
              for(Element e : statution) {
                 String XGR = "";
                 String QJ = "";
@@ -177,6 +206,7 @@ public class CriminalJudgmenSeek {
         }else {
             offSet += "无";
         }
+        System.out.println(" 酌定从轻量刑"+offSet);
         return offSet;
     }
 
@@ -186,9 +216,14 @@ public class CriminalJudgmenSeek {
      */
     public String offSetByLaw() {
 
-        String offSetByLaw = "";
-        List<Element> offsetByLawList = root.getChild("QW").getChild("CPFXGC").getChild("LXQJ").getChildren("FDLXQJ");
-        if(null!= offsetByLawList) {
+        String offSetByLaw = "无";
+        List<Element> offsetByLawList = new ArrayList<Element>();
+        try{
+            offsetByLawList = root.getChild("QW").getChild("CPFXGC").getChild("LXQJ").getChildren("FDLXQJ");
+        }catch(NullPointerException e) {
+            return "无";
+        }
+        if(!offsetByLawList.isEmpty()) {
             String name = "";
             String QJ = "";
             for(Element e:offsetByLawList) {
@@ -203,6 +238,7 @@ public class CriminalJudgmenSeek {
         }else {
             offSetByLaw = "无";
         }
+        System.out.println("法定从轻量刑;："+offSetByLaw);
         return offSetByLaw;
     }
 

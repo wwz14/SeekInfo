@@ -29,10 +29,13 @@ public class CivilActionSeek {
         public String hasCivilAction() {
             String general = root.getChild("QW").getAttributeValue("value");
             if(general.contains("民事诉讼")){
+                System.out.println("是否附带民事诉讼:" + "是");
                 return "是";
             }else{
+                System.out.println("是否附带民事诉讼:" + "否");
                 return "否";
             }
+
         }
 
         public String getCivilActionContent() {
@@ -44,6 +47,7 @@ public class CivilActionSeek {
                     content+=contentDes+"\n";
                 }
             }
+            System.out.println("民事诉讼内容："+content);
            return content;
         }
 
