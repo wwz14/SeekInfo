@@ -54,3 +54,10 @@ body {
     margin:40px auto;
     width:80%;
 }
+
+.chart {
+width:1000px;
+height:500px;
+position: relative;
+top: -149px;
+}
